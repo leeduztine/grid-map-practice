@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1
   heroName: Elf
-  sprite: {fileID: 21300000, guid: 10551c9ddb5ec674ea8b1aa870ebe35d, type: 3}
+  sprite: {fileID: 21300000, guid: 18588889200ba11418bbe1e76e43fdec, type: 3}
   hp: 70
   atk: 14
   armor: 2

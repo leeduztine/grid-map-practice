@@ -30,8 +30,10 @@ public class Ground : MonoBehaviourSingleton<Ground>
             // destination tile has null data 
             
             grid.SetValue(grid.SelectXY(hd.Origin), null);
-            hd.UpdateHeroPosition(grid.GetTilePosition(SelectedTile()), true);
             grid.SetValue(SelectedTile(), hd.gameObject.GetComponent<HeroProfile>());
+            hd.UpdateOriginPosition(grid.GetTilePosition(SelectedTile()), true);
+            
+            // grid.PrintNearTiles(SelectedTile(),1,txt);
         }
         else
         {
@@ -48,7 +50,7 @@ public class Ground : MonoBehaviourSingleton<Ground>
     public void SwapHeroPos(HeroDragging hd1, HeroDragging hd2)
     {
         var tmpPos = hd1.Origin;
-        hd1.UpdateHeroPosition(hd2.Origin,true);
-        hd2.UpdateHeroPosition(tmpPos,true);
+        hd1.UpdateOriginPosition(hd2.Origin,true);
+        hd2.UpdateOriginPosition(tmpPos,true);
     }
 }

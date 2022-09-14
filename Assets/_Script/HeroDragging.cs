@@ -44,7 +44,10 @@ public class HeroDragging : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
-        graphic.transform.DOScale(originalScale, 0.2f);
+        graphic.transform.DOScale(0.75f * originalScale, 0.2f).OnComplete(() =>
+        {
+            graphic.transform.DOScale(originalScale, 0.2f);
+        });
         graphic.transform.DORotate(originalRotation, 0.2f);
         
         Ground.Instance.DragIntoGround(this);
@@ -64,11 +67,13 @@ public class HeroDragging : MonoBehaviour
         }
     }
 
-    public void UpdateHeroPosition(Vector3 pos, bool isOnGround)
+    public void UpdateOriginPosition(Vector3 pos, bool isOnGround)
     {
         origin = pos;
 
         if (isOnGround) transform.localScale = scaleOnGround * Vector3.one;
         else transform.localScale = scaleOnDeck * Vector3.one;
+        
+        transform.DOMove(origin, 0.2f);
     }
 }

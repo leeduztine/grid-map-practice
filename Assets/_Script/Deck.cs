@@ -22,12 +22,12 @@ public class Deck : MonoBehaviourSingleton<Deck>
     {
         if (SelectedTile() == null) return;
         
-        hd.UpdateHeroPosition(grid.GetTilePosition(SelectedTile()),false);
+        hd.UpdateOriginPosition(grid.GetTilePosition(SelectedTile()),false);
     }
     
     public void SwapHeroPos(HeroDragging hd1, HeroDragging hd2)
     {
-        hd1.UpdateHeroPosition(hd2.Origin,false);
-        hd2.UpdateHeroPosition(hd1.Origin,false);
+        hd1.UpdateOriginPosition(hd2.Origin,false);
+        hd2.UpdateOriginPosition(hd1.Origin,false);
     }
 }

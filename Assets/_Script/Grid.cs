@@ -102,6 +102,28 @@ namespace GridMap
             return GetValue(tile.x, tile.y);
         }
 
+        public List<Tile> GetNearTiles(Tile tile, int range)
+        {
+            List<Tile> tiles = new List<Tile>();
+            int posX = tile.x;
+            int posY = tile.y;
+
+            for (int x = posX - range; x <= posX + range; x++)
+            {
+                for (int y = posY - range; y <= posY + range; y++)
+                {
+                    if (x < 0 || x >= width || y < 0 || y >= height || (x == posX && y == posY))
+                    {
+                        continue;
+                    }
+                    
+                    tiles.Add(new Tile(x,y));
+                }
+            }
+            
+            return tiles;
+        }
+
         public void SwapValue(Tile tile1, Tile tile2)
         {
             if (tile1 == null || tile2 == null) return;
@@ -120,7 +142,7 @@ namespace GridMap
                 {
                     if (drawIndexes)
                         UtilsClass.CreateWorldText($"{x},{y}", null, GetTilePosition(x, y),
-                            20, Color.yellow, TextAnchor.MiddleCenter);
+                            20, Color.yellow, TextAnchor.MiddleCenter,TextAlignment.Center,-999);
 
                     if (drawOutlines)
                     {
@@ -154,7 +176,36 @@ namespace GridMap
 
                 matrix += "\n";
             }
-            Debug.Log(matrix);
+            txt.text = matrix;
+        }
+
+        public void PrintNearTiles(Tile tile, int range, Text txt)
+        {
+            List<Tile> tiles = GetNearTiles(tile, range);
+            
+            Debug.Log(tiles.Count);
+            
+            string matrix = "";
+            for (int y = height - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (tile.x == x && tile.y == y) matrix += "o ";
+                    else
+                    {
+                        bool isNear = false;
+                        tiles.ForEach(t =>
+                        {
+                            if (t.x == x && t.y == y) isNear = true;
+                        });
+
+                        if (isNear) matrix += "x ";
+                        else matrix += "- ";
+                    }
+                }
+
+                matrix += "\n";
+            }
             txt.text = matrix;
         }
 
@@ -171,6 +222,11 @@ namespace GridMap
         {
             this.x = x;
             this.y = y;
+        }
+
+        public string GetName()
+        {
+            return $"[{x},{y}]";
         }
     }
 }
