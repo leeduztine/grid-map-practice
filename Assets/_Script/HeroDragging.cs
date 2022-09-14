@@ -5,21 +5,23 @@ using CodeMonkey.Utils;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using GridMap;
 
 public class HeroDragging : MonoBehaviour
 {
     public Test test;
 
     private bool isDragging = false;
-    private Color color;
+    private SpriteRenderer sr;
     private Vector3 origin;
-    private float originScale = 7f;
+    private float originScale = 1f;
     private Vector3 delta = Vector3.zero;
 
     private void Start()
     {
         origin = transform.position;
-        color = GetComponent<SpriteRenderer>().color;
+        sr = GetComponent<SpriteRenderer>();
+        originScale = transform.localScale.x;
     }
 
     private void OnMouseDown()
@@ -27,20 +29,22 @@ public class HeroDragging : MonoBehaviour
         delta = UtilsClass.GetMouseWorldPosition() - transform.position;
         
         isDragging = true;
-        color = Color.red;
-        transform.DOScale(1.25f * originScale, 0.2f);
+        sr.color = Color.red;
+        transform.DOScale(1.5f * originScale, 0.2f);
+        transform.DORotate(new Vector3(0f, 0f, -30), 0.2f);
     }
 
     private void OnMouseUp()
     {
         isDragging = false;
-        color = Color.white;
+        sr.color = Color.white;
         transform.DOScale(originScale, 0.2f);
+        transform.DORotate(new Vector3(0f, 0f, 0), 0.2f);
 
-        Grid grid = test.grid;
-        Grid.Tile tile = grid.SelectXY(transform.position);
+        var grid = test.arena;
+        Tile tile = grid.SelectXY(UtilsClass.GetMouseWorldPosition());
 
-        if (tile != new Grid.Tile(-1,-1))
+        if (tile != null)
         {
             origin = grid.GetTilePosition(tile);
         }
@@ -52,8 +56,10 @@ public class HeroDragging : MonoBehaviour
     {
         if (isDragging)
         {
-            transform.Translate(UtilsClass.GetMouseWorldPosition() - 
-                                (transform.position + delta));
+            // transform.Translate(UtilsClass.GetMouseWorldPosition() - 
+            //                     (transform.position + delta));
+
+            transform.position = UtilsClass.GetMouseWorldPosition() - delta;
         }
     }
     
