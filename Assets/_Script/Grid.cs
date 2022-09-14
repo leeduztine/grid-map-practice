@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey.Utils;
 using DG.DemiLib;
+using UnityEngine.UI;
 
 namespace GridMap
 {
@@ -42,6 +44,7 @@ namespace GridMap
 
         public Vector3 GetTilePosition(Tile tile)
         {
+            if (tile == null) return default;
             return GetTilePosition(tile.x, tile.y);
         }
 
@@ -55,11 +58,9 @@ namespace GridMap
         {
             if (x < 0 || x >= width || y < 0 || y >= height)
             {
-                Debug.Log($"selected outside grid");
                 return null;
             }
 
-            Debug.Log($"selected [{x},{y}]");
             return new Tile(x, y);
         }
 
@@ -78,6 +79,12 @@ namespace GridMap
 
             gridArray[x, y] = value;
         }
+        
+        public void SetValue(Tile tile, TGridObject value)
+        {
+            if (tile == null) return;
+            SetValue(tile.x, tile.y, value);
+        }
 
         public TGridObject GetValue(int x, int y)
         {
@@ -87,6 +94,20 @@ namespace GridMap
             }
 
             return gridArray[x, y];
+        }
+        
+        public TGridObject GetValue(Tile tile)
+        {
+            if (tile == null) return default;
+            return GetValue(tile.x, tile.y);
+        }
+
+        public void SwapValue(Tile tile1, Tile tile2)
+        {
+            if (tile1 == null || tile2 == null) return;
+            var tmpData = GetValue(tile1);
+            SetValue(tile1,GetValue(tile2));
+            SetValue(tile2,tmpData);
         }
 
         #region Unimportant methods, just for debugging
@@ -118,6 +139,23 @@ namespace GridMap
                 Debug.DrawLine(origin + GetWorldPosition(0, height), origin + GetWorldPosition(width, height),
                     Color.white, 100f);
             }
+        }
+        
+        public void PrintGridArray(Text txt)
+        {
+            string matrix = "";
+            for (int y = height - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (gridArray[x, y] == null) matrix += "- ";
+                    else matrix += "x ";
+                }
+
+                matrix += "\n";
+            }
+            Debug.Log(matrix);
+            txt.text = matrix;
         }
 
         #endregion

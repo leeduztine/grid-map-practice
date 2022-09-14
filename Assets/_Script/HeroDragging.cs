@@ -5,49 +5,50 @@ using CodeMonkey.Utils;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using GridMap;
 
 public class HeroDragging : MonoBehaviour
 {
-    public Test test;
-
     private bool isDragging = false;
-    private SpriteRenderer sr;
+    
     private Vector3 origin;
-    private float originScale = 1f;
+
+    public Vector3 Origin
+    {
+        get => origin;
+    }
+    
+    [SerializeField] private Transform graphic;
+    private float originalScale = 1f;
+    private Vector3 originalRotation = Vector3.zero;
     private Vector3 delta = Vector3.zero;
+
+    private float scaleOnGround = 1f;
+    private float scaleOnDeck = 1.25f;
 
     private void Start()
     {
         origin = transform.position;
-        sr = GetComponent<SpriteRenderer>();
-        originScale = transform.localScale.x;
+        originalScale = graphic.localScale.x;
+        originalRotation = graphic.rotation.eulerAngles;
     }
 
     private void OnMouseDown()
     {
         delta = UtilsClass.GetMouseWorldPosition() - transform.position;
-        
         isDragging = true;
-        sr.color = Color.red;
-        transform.DOScale(1.5f * originScale, 0.2f);
-        transform.DORotate(new Vector3(0f, 0f, -30), 0.2f);
+        
+        graphic.transform.DOScale(1.5f * originalScale, 0.2f);
+        graphic.transform.DORotate(originalRotation + new Vector3(0f,0f,-30f), 0.2f);
     }
 
     private void OnMouseUp()
     {
         isDragging = false;
-        sr.color = Color.white;
-        transform.DOScale(originScale, 0.2f);
-        transform.DORotate(new Vector3(0f, 0f, 0), 0.2f);
-
-        var grid = test.arena;
-        Tile tile = grid.SelectXY(UtilsClass.GetMouseWorldPosition());
-
-        if (tile != null)
-        {
-            origin = grid.GetTilePosition(tile);
-        }
+        graphic.transform.DOScale(originalScale, 0.2f);
+        graphic.transform.DORotate(originalRotation, 0.2f);
+        
+        Ground.Instance.DragIntoGround(this);
+        Deck.Instance.DragIntoDeck(this);
 
         transform.DOMove(origin, 0.2f);
     }
@@ -62,5 +63,12 @@ public class HeroDragging : MonoBehaviour
             transform.position = UtilsClass.GetMouseWorldPosition() - delta;
         }
     }
-    
+
+    public void UpdateHeroPosition(Vector3 pos, bool isOnGround)
+    {
+        origin = pos;
+
+        if (isOnGround) transform.localScale = scaleOnGround * Vector3.one;
+        else transform.localScale = scaleOnDeck * Vector3.one;
+    }
 }
