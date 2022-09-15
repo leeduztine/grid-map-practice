@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 public class HeroDragging : MonoBehaviour
 {
     private bool isDragging = false;
-    
+
     private Vector3 origin;
 
     public Vector3 Origin
@@ -27,7 +27,7 @@ public class HeroDragging : MonoBehaviour
 
     [SerializeField] private SpriteRenderer[] srElements;
 
-    private void Start()
+    private void Awake()
     {
         origin = transform.position;
         originalScale = graphic.localScale.x;

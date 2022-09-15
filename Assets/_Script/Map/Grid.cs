@@ -91,6 +91,20 @@ namespace GridMap
             return gridArray[tile.x, tile.y];
         }
 
+        public List<TGridObject> GetAllValue()
+        {
+            List<TGridObject> list = new List<TGridObject>();
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (gridArray[x,y] != null)
+                        list.Add(gridArray[x,y]);
+                }
+            }
+            return list;
+        }
+
         public List<Tile> GetNearTiles(Tile tile, int range)
         {
             List<Tile> tiles = new List<Tile>();
@@ -121,6 +135,17 @@ namespace GridMap
             var tmpData2 = GetValue(tile2);
             SetValue(tile1,tmpData2);
             SetValue(tile2,tmpData1);
+        }
+
+        public void Clear()
+        {
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    SetValue(new Tile(x,y), default);
+                }
+            }
         }
 
         #region Unimportant methods, just for debugging

@@ -16,11 +16,6 @@ public class Ground : MonoBehaviourSingleton<Ground>
         grid = new Grid<HeroProfile>(new Vector3(0f, 9f, 0f), 5, 5, 10f);
     }
 
-    public Tile SelectedTile()
-    {
-        return grid.WorldPositionToTile(UtilsClass.GetMouseWorldPosition());
-    }
-
     public void DragIntoGround(HeroDragging hd)
     {
         Tile nullTile = new Tile(-1,-1);
@@ -61,5 +56,30 @@ public class Ground : MonoBehaviourSingleton<Ground>
         hd1.MoveToOrigin();
         hd2.UpdateOrigin(tmpPos1,true);
         hd2.MoveToOrigin();
+    }
+
+    public void SpawnHero(HeroDragging hd, Tile tile)
+    {
+        grid.SetValue(tile,hd.gameObject.GetComponent<HeroProfile>());
+        hd.UpdateOrigin(grid.TileToWorldPosition(tile),true);
+        hd.MoveToOrigin();
+        
+        grid.PrintGridArray(txt);
+    }
+
+    public int NumberOfValue()
+    {
+        return grid.GetAllValue().Count;
+    }
+
+    public void DestroyAll()
+    {
+        var heroes = grid.GetAllValue();
+        heroes.ForEach(hero =>
+        {
+            Destroy(hero.gameObject);
+        });
+        
+        grid.PrintGridArray(txt);
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using GridMap;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 public class HeroProfile : MonoBehaviour
 {
@@ -14,8 +15,6 @@ public class HeroProfile : MonoBehaviour
         get => id;
     }
     
-    [SerializeField] private HeroState state;
-
     [SerializeField] private SpriteRenderer sr;
 
     // states
@@ -30,9 +29,9 @@ public class HeroProfile : MonoBehaviour
     private int[] xpRequirement = new []{0,30,90};
 
     // buff/debuff
-    private bool isStunned = false;
-    private bool isSilent = false;
-    private bool isBleeding = false;
+    private bool isStunned;
+    private bool isSilent;
+    private bool isBleeding;
     
     private int tier = 1;
 
@@ -54,11 +53,10 @@ public class HeroProfile : MonoBehaviour
 
     private void Start()
     {
-        LoadHeroState();
-        curHp = maxHp;
+        
     }
 
-    private void LoadHeroState()
+    public void LoadHeroState(HeroState state, int xp)
     {
         id = state.id;
         sr.sprite = state.icon;
@@ -68,6 +66,17 @@ public class HeroProfile : MonoBehaviour
         armor = state.armor;
         range = state.range;
         reload = state.reload;
+
+        curHp = maxHp;
+
+        isStunned = false;
+        isSilent = false;
+        isBleeding = false;
+
+        curXp = xp;
+        tier = 1;
+        if (xp >= 30) Upgrade();
+        if (xp >= 90) Upgrade();
     }
 
     public float GetHpPercentage()
@@ -77,6 +86,7 @@ public class HeroProfile : MonoBehaviour
     
     public int GetTier() => tier;
 
+    [Button]
     public void GainXp()
     {
         if (tier == 3) return;
@@ -88,6 +98,7 @@ public class HeroProfile : MonoBehaviour
         }
     }
 
+    [Button]
     public void Upgrade()
     {
         if (tier == 3) return;
@@ -102,6 +113,7 @@ public class HeroProfile : MonoBehaviour
         }
     }
 
+    [Button]
     public void ResetTier()
     {
         tier = 1;
@@ -115,22 +127,21 @@ public class HeroProfile : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int amount/*, bool isTrueDmg = false*/)
+    [Button]
+    public void TakeDamage(int amount, bool isTrueDmg = false)
     {
-        int lastHp = curHp;
-        
         int takenDmg = amount;
-        /*if (!isTrueDmg)*/ takenDmg -= armor;
+        if (!isTrueDmg) takenDmg -= armor;
+        if (takenDmg < 1) takenDmg = 1;
         
         curHp -= takenDmg;
         if (curHp < 0) curHp = 0;
         OnHpChangeCallback?.Invoke(true);
     }
 
+    [Button]
     public void Heal(int amount)
     {
-        int lastHp = curHp;
-        
         int healAmount = amount;
         if (isBleeding) healAmount /= 2;
 
