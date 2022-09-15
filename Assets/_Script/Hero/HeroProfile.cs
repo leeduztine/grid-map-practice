@@ -26,9 +26,8 @@ public class HeroProfile : MonoBehaviour
     private int range;
     private float reload;
 
-    private int curXp;
-    private int maxXp;
-    private int[] xpRequirement = new []{0,20,60};
+    private int curXp = 10;
+    private int[] xpRequirement = new []{0,30,90};
 
     // buff/debuff
     private bool isStunned = false;
@@ -57,9 +56,6 @@ public class HeroProfile : MonoBehaviour
     {
         LoadHeroState();
         curHp = maxHp;
-
-        curXp = 0;
-        maxXp = xpRequirement[tier];
     }
 
     private void LoadHeroState()
@@ -73,6 +69,11 @@ public class HeroProfile : MonoBehaviour
         range = state.range;
         reload = state.reload;
     }
+
+    public float GetHpPercentage()
+    {
+        return (float) curHp / maxHp;
+    }
     
     public int GetTier() => tier;
 
@@ -81,15 +82,9 @@ public class HeroProfile : MonoBehaviour
         if (tier == 3) return;
         curXp += 10;
 
-        if (curXp == maxXp)
+        if (curXp == xpRequirement[tier])
         {
             Upgrade();
-
-            if (tier < 3)
-            {
-                curXp = 0;
-                maxXp = xpRequirement[tier];
-            }
         }
     }
 
@@ -150,18 +145,18 @@ public class HeroProfile : MonoBehaviour
         {
             subHpBar.GetChild(0).GetComponent<SpriteRenderer>().color = Color.yellow;
             DOTween.Kill(mainHpBar);
-            mainHpBar.DOScaleX(curHp / maxHp, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+            mainHpBar.DOScaleX(GetHpPercentage(), 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
-                subHpBar.DOScaleX(curHp / maxHp, 0.3f).SetEase(Ease.InQuad);
+                subHpBar.DOScaleX(GetHpPercentage(), 0.2f).SetEase(Ease.InQuad);
             });
         }
         else
         {
             subHpBar.GetChild(0).GetComponent<SpriteRenderer>().color = Color.green;
             DOTween.Kill(subHpBar);
-            subHpBar.DOScaleX(curHp / maxHp, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+            subHpBar.DOScaleX(GetHpPercentage(), 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
-                mainHpBar.DOScaleX(curHp / maxHp, 0.3f).SetEase(Ease.InQuad);
+                mainHpBar.DOScaleX(GetHpPercentage(), 0.2f).SetEase(Ease.InQuad);
             });
         }
     }
