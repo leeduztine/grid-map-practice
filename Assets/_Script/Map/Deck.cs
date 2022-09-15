@@ -1,19 +1,35 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using GridMap;
 using UnityEngine;
 using CodeMonkey.Utils;
+using UnityEngine.UI;
 
-public class Deck : MonoBehaviourSingleton<Deck>
+public class Deck : BaseMap
 {
-    private Grid<HeroProfile> grid;
+    private static Deck instance;
 
-    void Start()
+    public static Deck Instance
     {
-        grid = new Grid<HeroProfile>(new Vector3(0f, -27f, 0f), 5, 1, 12.5f);
+        get => instance;
     }
 
-    public void DragIntoDeck(HeroDragging hd)
+    private void Awake()
+    {
+        if (instance == null) 
+            instance = this;
+        else if (instance != this) 
+            Destroy(gameObject);
+    }
+
+    protected override void Start()
+    {
+        grid = new Grid<HeroProfile>(new Vector3(0f, -27f, 0f), 5, 1, 12.5f);
+        base.Start();
+    }
+
+    public override void DragIntoMap(HeroDragging hd)
     {
         Tile nullTile = new Tile(-1,-1);
         Tile selectedTile = grid.WorldPositionToTile(UtilsClass.GetMouseWorldPosition());
@@ -29,7 +45,7 @@ public class Deck : MonoBehaviourSingleton<Deck>
             // selected tile is empty -> move
             
             grid.SetValue(selectedTile, hd.gameObject.GetComponent<HeroProfile>());
-            grid.SetValue(grid.WorldPositionToTile(hd.Origin), null);
+            grid.SetValue(grid.WorldPositionToTile(hd.origin), null);
             hd.UpdateOrigin(grid.TileToWorldPosition(selectedTile),false);
             hd.MoveToOrigin();
         }
@@ -38,15 +54,17 @@ public class Deck : MonoBehaviourSingleton<Deck>
             // selected tile already has a hero -> swap
 
             var hd2 = grid.GetValue(selectedTile).gameObject.GetComponent<HeroDragging>();
-            grid.SwapValue(selectedTile, grid.WorldPositionToTile(hd.Origin));
-            SwapHeroPos(hd,hd2);
+            grid.SwapValue(selectedTile, grid.WorldPositionToTile(hd.origin));
+            SwapHero(hd,hd2);
         }
+        
+        base.DragIntoMap(hd);
     }
 
-    public void SwapHeroPos(HeroDragging hd1, HeroDragging hd2)
+    public override void SwapHero(HeroDragging hd1, HeroDragging hd2)
     {
-        Vector3 tmpPos1 = hd1.Origin;
-        Vector3 tmpPos2 = hd2.Origin;
+        Vector3 tmpPos1 = hd1.origin;
+        Vector3 tmpPos2 = hd2.origin;
         hd1.UpdateOrigin(tmpPos2,false);
         hd1.MoveToOrigin();
         hd2.UpdateOrigin(tmpPos1,false);

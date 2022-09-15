@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CodeMonkey.Utils;
 using DG.Tweening;
+using GridMap;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,13 +11,10 @@ public class HeroDragging : MonoBehaviour
 {
     private bool isDragging = false;
 
-    private Vector3 origin;
+    public Vector3 origin { get; private set; }
+    public GridType gridType { get; private set; }
+    public Tile curTile;
 
-    public Vector3 Origin
-    {
-        get => origin;
-    }
-    
     [SerializeField] private Transform graphic;
     private float originalScale = 1f;
     private Vector3 originalRotation = Vector3.zero;
@@ -62,8 +60,8 @@ public class HeroDragging : MonoBehaviour
             sr.sortingOrder -= 100;
         }
         
-        Ground.Instance.DragIntoGround(this);
-        Deck.Instance.DragIntoDeck(this);
+        Ground.Instance.DragIntoMap(this);
+        Deck.Instance.DragIntoMap(this);
     }
 
     void Update()
@@ -81,8 +79,20 @@ public class HeroDragging : MonoBehaviour
     {
         origin = pos;
 
-        if (isOnGround) transform.localScale = scaleOnGround * Vector3.one;
-        else transform.localScale = scaleOnDeck * Vector3.one;
+        if (isOnGround)
+        {
+            transform.localScale = scaleOnGround * Vector3.one;
+            gridType = GridType.Ground;
+            curTile = Ground.Instance.GetMapTile(origin);
+        }
+        else
+        {
+            transform.localScale = scaleOnDeck * Vector3.one;
+            gridType = GridType.Deck;
+            curTile = Deck.Instance.GetMapTile(origin);
+        }
+        
+        Debug.Log($"{gridType} {curTile.x},{curTile.y}");
     }
 
     public void MoveToOrigin()

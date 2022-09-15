@@ -28,8 +28,6 @@ namespace GridMap
             gridArray = new TGridObject[width, height];
 
             Debug.Log($"Grid {height}x{width} is created");
-
-            DrawGrid();
         }
 
         private Tile nullTile = new Tile(-1,-1);
@@ -150,15 +148,19 @@ namespace GridMap
 
         #region Unimportant methods, just for debugging
 
-        private void DrawGrid(bool drawOutlines = true, bool drawIndexes = true)
+        public void DrawGrid(Transform txtParent, bool drawOutlines = true, bool drawIndexes = true)
         {
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
                     if (drawIndexes)
-                        UtilsClass.CreateWorldText($"{x},{y}", null, TileToWorldPosition(new Tile(x, y)),
-                            20, Color.yellow, TextAnchor.MiddleCenter,TextAlignment.Center,-999);
+                    {
+                        var txt = UtilsClass.CreateWorldText($"{x},{y}", null, TileToWorldPosition(new Tile(x, y)),
+                            20, Color.yellow, TextAnchor.MiddleCenter, TextAlignment.Center, -999);
+                        
+                        txt.gameObject.transform.SetParent(txtParent);
+                    }
 
                     if (drawOutlines)
                     {

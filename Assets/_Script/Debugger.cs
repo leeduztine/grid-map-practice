@@ -28,19 +28,25 @@ public class Debugger : MonoBehaviour
             {
                 Ground.Instance.SpawnHero(obj.GetComponent<HeroDragging>(),new Tile(hero.curTileX, hero.curTileY));
             }
+            else
+            {
+                Deck.Instance.SpawnHero(obj.GetComponent<HeroDragging>(),new Tile(hero.curTileX, hero.curTileY));   
+            }
         });
     }
 
     [Button]
     public void PrintNumberOfValue()
     {
-        Debug.Log(Ground.Instance.NumberOfValue());
+        Debug.Log($"Ground: {Ground.Instance.GetNumberOfValue()}");
+        Debug.Log($"Deck: {Deck.Instance.GetNumberOfValue()}");
     }
 
     [Button]
     public void DestroyAll()
     {
         Ground.Instance.DestroyAll();
+        Deck.Instance.DestroyAll();
     }
 }
 

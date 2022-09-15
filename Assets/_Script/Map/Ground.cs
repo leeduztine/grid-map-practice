@@ -5,18 +5,30 @@ using UnityEngine;
 using GridMap;
 using UnityEngine.UI;
 
-public class Ground : MonoBehaviourSingleton<Ground>
+public class Ground : BaseMap
 {
-    private Grid<HeroProfile> grid;
+    private static Ground instance;
 
-    [SerializeField] private Text txt;
-
-    void Start()
+    public static Ground Instance
     {
-        grid = new Grid<HeroProfile>(new Vector3(0f, 9f, 0f), 5, 5, 10f);
+        get => instance;
     }
 
-    public void DragIntoGround(HeroDragging hd)
+    private void Awake()
+    {
+        if (instance == null) 
+            instance = this;
+        else if (instance != this) 
+            Destroy(gameObject);
+    }
+    
+    protected override void Start()
+    {
+        grid = new Grid<HeroProfile>(new Vector3(0f, 9f, 0f), 5, 5, 10f);
+        base.Start();
+    }
+
+    public override void DragIntoMap(HeroDragging hd)
     {
         Tile nullTile = new Tile(-1,-1);
         Tile selectedTile = grid.WorldPositionToTile(UtilsClass.GetMouseWorldPosition());
@@ -32,7 +44,7 @@ public class Ground : MonoBehaviourSingleton<Ground>
             // selected tile is empty -> move
             
             grid.SetValue(selectedTile, hd.gameObject.GetComponent<HeroProfile>());
-            grid.SetValue(grid.WorldPositionToTile(hd.Origin), null);
+            grid.SetValue(grid.WorldPositionToTile(hd.origin), null);
             hd.UpdateOrigin(grid.TileToWorldPosition(selectedTile),true);
             hd.MoveToOrigin();
         }
@@ -41,45 +53,20 @@ public class Ground : MonoBehaviourSingleton<Ground>
             // selected tile already has a hero -> swap
 
             var hd2 = grid.GetValue(selectedTile).gameObject.GetComponent<HeroDragging>();
-            grid.SwapValue(selectedTile, grid.WorldPositionToTile(hd.Origin));
-            SwapHeroPos(hd,hd2);
+            grid.SwapValue(selectedTile, grid.WorldPositionToTile(hd.origin));
+            SwapHero(hd,hd2);
         }
         
-        grid.PrintGridArray(txt);
+        base.DragIntoMap(hd);
     }
 
-    public void SwapHeroPos(HeroDragging hd1, HeroDragging hd2)
+    public override void SwapHero(HeroDragging hd1, HeroDragging hd2)
     {
-        Vector3 tmpPos1 = hd1.Origin;
-        Vector3 tmpPos2 = hd2.Origin;
+        Vector3 tmpPos1 = hd1.origin;
+        Vector3 tmpPos2 = hd2.origin;
         hd1.UpdateOrigin(tmpPos2,true);
         hd1.MoveToOrigin();
         hd2.UpdateOrigin(tmpPos1,true);
         hd2.MoveToOrigin();
-    }
-
-    public void SpawnHero(HeroDragging hd, Tile tile)
-    {
-        grid.SetValue(tile,hd.gameObject.GetComponent<HeroProfile>());
-        hd.UpdateOrigin(grid.TileToWorldPosition(tile),true);
-        hd.MoveToOrigin();
-        
-        grid.PrintGridArray(txt);
-    }
-
-    public int NumberOfValue()
-    {
-        return grid.GetAllValue().Count;
-    }
-
-    public void DestroyAll()
-    {
-        var heroes = grid.GetAllValue();
-        heroes.ForEach(hero =>
-        {
-            Destroy(hero.gameObject);
-        });
-        
-        grid.PrintGridArray(txt);
     }
 }
