@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey.Utils;
-using DG.DemiLib;
 using UnityEngine.UI;
 
 namespace GridMap
@@ -13,8 +12,9 @@ namespace GridMap
         private int width { get; }
         private int height { get; }
         private float cellSize { get; }
-        private Vector3 origin; // left-bottom Tile [0,0] of grid
         private TGridObject[,] gridArray;
+        
+        private readonly Vector3 origin; // position of tile[0,0]'s left-bot corner
 
         public Grid(Vector3 center = default, int width = 1, int height = 1, float cellSize = 1)
         {
@@ -32,74 +32,63 @@ namespace GridMap
             DrawGrid();
         }
 
+        private Tile nullTile = new Tile(-1,-1);
+
+        private bool CheckValidTile(Tile tile)
+        {
+            if (tile.x < 0 || tile.x >= width || tile.y < 0 || tile.y >= height)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private Vector3 GetWorldPosition(int x, int y)
         {
+            // Position of tile's left-bot corner
+            //     ______
+            //    |     |
+            //   (*)----
             return new Vector3(x, y) * cellSize;
         }
-
-        public Vector3 GetTilePosition(int x, int y)
+        
+        public Vector3 TileToWorldPosition(Tile tile)
         {
-            return origin + GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * 0.5f;
+            // Position of tile's center
+            //     ______
+            //    | (*) |
+            //    ------
+            return origin + GetWorldPosition(tile.x, tile.y) + new Vector3(cellSize, cellSize) * 0.5f;
         }
 
-        public Vector3 GetTilePosition(Tile tile)
+        public Tile WorldPositionToTile(Vector3 worldPosition)
         {
-            if (tile == null) return default;
-            return GetTilePosition(tile.x, tile.y);
-        }
-
-        private void GetXY(Vector3 worldPosition, out int x, out int y)
-        {
-            x = Mathf.FloorToInt((worldPosition - origin).x / cellSize);
-            y = Mathf.FloorToInt((worldPosition - origin).y / cellSize);
-        }
-
-        public Tile SelectXY(int x, int y)
-        {
+            int x = Mathf.FloorToInt((worldPosition - origin).x / cellSize);
+            int y = Mathf.FloorToInt((worldPosition - origin).y / cellSize);
+            
             if (x < 0 || x >= width || y < 0 || y >= height)
             {
-                return null;
+                // Debug.Log("selected outside grid");
+                return nullTile;
             }
 
+            // Debug.Log($"selected Tile {x},{y}");
             return new Tile(x, y);
-        }
-
-        public Tile SelectXY(Vector3 worldPosition)
-        {
-            GetXY(worldPosition, out int x, out int y);
-            return SelectXY(x, y);
-        }
-
-        public void SetValue(int x, int y, TGridObject value)
-        {
-            if (x < 0 || x >= width || y < 0 || y >= height)
-            {
-                return;
-            }
-
-            gridArray[x, y] = value;
         }
         
         public void SetValue(Tile tile, TGridObject value)
         {
-            if (tile == null) return;
-            SetValue(tile.x, tile.y, value);
-        }
-
-        public TGridObject GetValue(int x, int y)
-        {
-            if (x < 0 || x >= width || y < 0 || y >= height)
-            {
-                return default;
-            }
-
-            return gridArray[x, y];
+            if (!CheckValidTile(tile)) return;
+            
+            gridArray[tile.x, tile.y] = value;
         }
         
         public TGridObject GetValue(Tile tile)
         {
-            if (tile == null) return default;
-            return GetValue(tile.x, tile.y);
+            if (!CheckValidTile(tile)) return default;
+
+            return gridArray[tile.x, tile.y];
         }
 
         public List<Tile> GetNearTiles(Tile tile, int range)
@@ -112,7 +101,7 @@ namespace GridMap
             {
                 for (int y = posY - range; y <= posY + range; y++)
                 {
-                    if (x < 0 || x >= width || y < 0 || y >= height || (x == posX && y == posY))
+                    if (!CheckValidTile(new Tile(x,y)) || tile == new Tile(x,y))
                     {
                         continue;
                     }
@@ -126,10 +115,12 @@ namespace GridMap
 
         public void SwapValue(Tile tile1, Tile tile2)
         {
-            if (tile1 == null || tile2 == null) return;
-            var tmpData = GetValue(tile1);
-            SetValue(tile1,GetValue(tile2));
-            SetValue(tile2,tmpData);
+            if (!CheckValidTile(tile1) || !CheckValidTile(tile2)) return;
+            
+            var tmpData1 = GetValue(tile1);
+            var tmpData2 = GetValue(tile2);
+            SetValue(tile1,tmpData2);
+            SetValue(tile2,tmpData1);
         }
 
         #region Unimportant methods, just for debugging
@@ -141,7 +132,7 @@ namespace GridMap
                 for (int y = 0; y < height; y++)
                 {
                     if (drawIndexes)
-                        UtilsClass.CreateWorldText($"{x},{y}", null, GetTilePosition(x, y),
+                        UtilsClass.CreateWorldText($"{x},{y}", null, TileToWorldPosition(new Tile(x, y)),
                             20, Color.yellow, TextAnchor.MiddleCenter,TextAlignment.Center,-999);
 
                     if (drawOutlines)
@@ -213,7 +204,7 @@ namespace GridMap
 
     }
 
-    public class Tile
+    public struct Tile
     {
         public int x { get; }
         public int y { get; }
@@ -223,10 +214,14 @@ namespace GridMap
             this.x = x;
             this.y = y;
         }
-
-        public string GetName()
+        public static bool operator ==(Tile t1, Tile t2)
         {
-            return $"[{x},{y}]";
+            return t1.x == t2.x && t1.y == t2.y;
+        }
+
+        public static bool operator !=(Tile t1, Tile t2)
+        {
+            return !(t1 == t2);
         }
     }
 }

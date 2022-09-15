@@ -25,6 +25,8 @@ public class HeroDragging : MonoBehaviour
     private float scaleOnGround = 1f;
     private float scaleOnDeck = 1.25f;
 
+    [SerializeField] private SpriteRenderer[] srElements;
+
     private void Start()
     {
         origin = transform.position;
@@ -39,6 +41,11 @@ public class HeroDragging : MonoBehaviour
         
         graphic.transform.DOScale(1.5f * originalScale, 0.2f);
         graphic.transform.DORotate(originalRotation + new Vector3(0f,0f,-30f), 0.2f);
+        
+        foreach (var sr in srElements)
+        {
+            sr.sortingOrder += 100;
+        }
     }
 
     private void OnMouseUp()
@@ -50,10 +57,13 @@ public class HeroDragging : MonoBehaviour
         });
         graphic.transform.DORotate(originalRotation, 0.2f);
         
+        foreach (var sr in srElements)
+        {
+            sr.sortingOrder -= 100;
+        }
+        
         Ground.Instance.DragIntoGround(this);
         Deck.Instance.DragIntoDeck(this);
-
-        transform.DOMove(origin, 0.2f);
     }
 
     void Update()
@@ -67,13 +77,16 @@ public class HeroDragging : MonoBehaviour
         }
     }
 
-    public void UpdateOriginPosition(Vector3 pos, bool isOnGround)
+    public void UpdateOrigin(Vector3 pos, bool isOnGround)
     {
         origin = pos;
 
         if (isOnGround) transform.localScale = scaleOnGround * Vector3.one;
         else transform.localScale = scaleOnDeck * Vector3.one;
-        
+    }
+
+    public void MoveToOrigin()
+    {
         transform.DOMove(origin, 0.2f);
     }
 }

@@ -763,6 +763,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 4167631746311234634}
+  srElements:
+  - {fileID: 4167631746311234635}
+  - {fileID: 8234354959712844819}
+  - {fileID: 8780776227118265845}
+  - {fileID: 1567141479231922567}
+  - {fileID: 8005684846425826164}
+  - {fileID: 221430412559338646}
+  - {fileID: 5541616058439606434}
+  - {fileID: 6809471769795237325}
 --- !u!114 &5725666705272270780
 MonoBehaviour:
   m_ObjectHideFlags: 0

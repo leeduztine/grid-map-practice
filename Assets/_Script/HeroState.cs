@@ -5,14 +5,17 @@ namespace GridMap
     [CreateAssetMenu(fileName = "New Hero", menuName = "Hero", order = 0)]
     public class HeroState : ScriptableObject
     {
+        // identity
         public int id;
         public string heroName;
-        public Sprite sprite;
+        public Sprite icon;
+        public Sprite img;
 
-        public float hp;
-        public float atk;
-        public float armor;
-        public float range;
+        // stats
+        public int hp;
+        public int atk;
+        public int armor;
+        public int range;
         public float reload;
     }
 }

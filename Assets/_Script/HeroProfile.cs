@@ -18,20 +18,30 @@ public class HeroProfile : MonoBehaviour
 
     [SerializeField] private SpriteRenderer sr;
 
-    private float maxHp;
-    private float curHp;
-    private float atk;
-    private float armor;
-    private float range;
+    // states
+    private int maxHp;
+    private int curHp;
+    private int atk;
+    private int armor;
+    private int range;
     private float reload;
 
+    private int curXp;
+    private int maxXp;
+    private int[] xpRequirement = new []{0,20,60};
+
+    // buff/debuff
+    private bool isStunned = false;
+    private bool isSilent = false;
+    private bool isBleeding = false;
+    
     private int tier = 1;
 
     [SerializeField] private Transform tierContainer;
     [SerializeField] private Transform mainHpBar;
     [SerializeField] private Transform subHpBar;
 
-    public Action<bool,float> OnHpChangeCallback;
+    public Action<bool> OnHpChangeCallback;
 
     private void OnEnable()
     {
@@ -45,19 +55,43 @@ public class HeroProfile : MonoBehaviour
 
     private void Start()
     {
+        LoadHeroState();
+        curHp = maxHp;
+
+        curXp = 0;
+        maxXp = xpRequirement[tier];
+    }
+
+    private void LoadHeroState()
+    {
         id = state.id;
+        sr.sprite = state.icon;
         
         maxHp = state.hp;
-        curHp = maxHp;
         atk = state.hp;
         armor = state.armor;
         range = state.range;
         reload = state.reload;
-
-        sr.sprite = state.sprite;
     }
     
     public int GetTier() => tier;
+
+    public void GainXp()
+    {
+        if (tier == 3) return;
+        curXp += 10;
+
+        if (curXp == maxXp)
+        {
+            Upgrade();
+
+            if (tier < 3)
+            {
+                curXp = 0;
+                maxXp = xpRequirement[tier];
+            }
+        }
+    }
 
     public void Upgrade()
     {
@@ -86,19 +120,31 @@ public class HeroProfile : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(int amount/*, bool isTrueDmg = false*/)
     {
-        curHp = Mathf.Clamp(curHp - amount, 0f, maxHp);
-        OnHpChangeCallback?.Invoke(true,amount);
+        int lastHp = curHp;
+        
+        int takenDmg = amount;
+        /*if (!isTrueDmg)*/ takenDmg -= armor;
+        
+        curHp -= takenDmg;
+        if (curHp < 0) curHp = 0;
+        OnHpChangeCallback?.Invoke(true);
     }
 
-    public void Heal(float amount)
+    public void Heal(int amount)
     {
-        curHp = Mathf.Clamp(curHp + amount, 0f, maxHp);
-        OnHpChangeCallback?.Invoke(false,amount);
+        int lastHp = curHp;
+        
+        int healAmount = amount;
+        if (isBleeding) healAmount /= 2;
+
+        curHp += healAmount;
+        if (curHp > maxHp) curHp = maxHp;
+        OnHpChangeCallback?.Invoke(false);
     }
 
-    private void OnHpChange(bool isDamaged, float amount)
+    private void OnHpChange(bool isDamaged)
     {
         if (isDamaged)
         {
@@ -106,7 +152,7 @@ public class HeroProfile : MonoBehaviour
             DOTween.Kill(mainHpBar);
             mainHpBar.DOScaleX(curHp / maxHp, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
-                subHpBar.DOScaleX(curHp / maxHp, 0.3f).SetEase(Ease.OutQuad);
+                subHpBar.DOScaleX(curHp / maxHp, 0.3f).SetEase(Ease.InQuad);
             });
         }
         else
@@ -115,7 +161,7 @@ public class HeroProfile : MonoBehaviour
             DOTween.Kill(subHpBar);
             subHpBar.DOScaleX(curHp / maxHp, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
-                mainHpBar.DOScaleX(curHp / maxHp, 0.3f).SetEase(Ease.OutQuad);
+                mainHpBar.DOScaleX(curHp / maxHp, 0.3f).SetEase(Ease.InQuad);
             });
         }
     }

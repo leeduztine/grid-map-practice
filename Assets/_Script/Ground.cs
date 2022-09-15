@@ -18,29 +18,35 @@ public class Ground : MonoBehaviourSingleton<Ground>
 
     public Tile SelectedTile()
     {
-        return grid.SelectXY(UtilsClass.GetMouseWorldPosition());
+        return grid.WorldPositionToTile(UtilsClass.GetMouseWorldPosition());
     }
 
     public void DragIntoGround(HeroDragging hd)
     {
-        if (SelectedTile() == null) return;
-        
-        if (grid.GetValue(SelectedTile()) == null)
+        Tile nullTile = new Tile(-1,-1);
+        Tile selectedTile = grid.WorldPositionToTile(UtilsClass.GetMouseWorldPosition());
+
+        if (selectedTile == nullTile)
         {
-            // destination tile has null data 
+            hd.MoveToOrigin();
+            return;
+        }
+
+        if (grid.GetValue(selectedTile) == null)
+        {
+            // selected tile is empty -> move
             
-            grid.SetValue(grid.SelectXY(hd.Origin), null);
-            grid.SetValue(SelectedTile(), hd.gameObject.GetComponent<HeroProfile>());
-            hd.UpdateOriginPosition(grid.GetTilePosition(SelectedTile()), true);
-            
-            // grid.PrintNearTiles(SelectedTile(),1,txt);
+            grid.SetValue(selectedTile, hd.gameObject.GetComponent<HeroProfile>());
+            grid.SetValue(grid.WorldPositionToTile(hd.Origin), null);
+            hd.UpdateOrigin(grid.TileToWorldPosition(selectedTile),true);
+            hd.MoveToOrigin();
         }
         else
         {
-            // destination tile already has a hero data
+            // selected tile already has a hero -> swap
 
-            grid.SwapValue(SelectedTile(),grid.SelectXY(hd.Origin));
-            var hd2 = grid.GetValue(SelectedTile()).gameObject.GetComponent<HeroDragging>();
+            var hd2 = grid.GetValue(selectedTile).gameObject.GetComponent<HeroDragging>();
+            grid.SwapValue(selectedTile, grid.WorldPositionToTile(hd.Origin));
             SwapHeroPos(hd,hd2);
         }
         
@@ -49,8 +55,11 @@ public class Ground : MonoBehaviourSingleton<Ground>
 
     public void SwapHeroPos(HeroDragging hd1, HeroDragging hd2)
     {
-        var tmpPos = hd1.Origin;
-        hd1.UpdateOriginPosition(hd2.Origin,true);
-        hd2.UpdateOriginPosition(tmpPos,true);
+        Vector3 tmpPos1 = hd1.Origin;
+        Vector3 tmpPos2 = hd2.Origin;
+        hd1.UpdateOrigin(tmpPos2,true);
+        hd1.MoveToOrigin();
+        hd2.UpdateOrigin(tmpPos1,true);
+        hd2.MoveToOrigin();
     }
 }
