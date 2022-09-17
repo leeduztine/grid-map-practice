@@ -15,6 +15,11 @@ public class BaseMap : MonoBehaviour
         grid.DrawGrid(gridVisualContainer);
     }
 
+    public Grid<HeroProfile> GetGrid()
+    {
+        return grid;
+    }
+
     public Tile GetMapTile(Vector3 worldPos)
     {
         return grid.WorldPositionToTile(worldPos);
@@ -22,12 +27,28 @@ public class BaseMap : MonoBehaviour
 
     public virtual void DragIntoMap(HeroDragging hd)
     {
-        grid.PrintGridArray(txt);
+        if (hd == null) return;
+        
+        Tile selectedTile = grid.WorldPositionToTile(hd.transform.position);
+
+        if (!grid.IsValid(selectedTile) || selectedTile == hd.curTile)
+        {
+            // not selected Deck or selected current Tile
+            hd.MoveToOrigin();
+            return;
+        }
+
+        DropIntoMap(hd,selectedTile);
+    }
+
+    public virtual void DropIntoMap(HeroDragging hd, Tile destination)
+    {
+        
     }
 
     public virtual void SwapHero(HeroDragging hd1, HeroDragging hd2)
     {
-        grid.PrintGridArray(txt);
+        
     }
 
     public void SpawnHero(HeroDragging hd, Tile tile)
@@ -36,7 +57,7 @@ public class BaseMap : MonoBehaviour
         hd.UpdateOrigin(grid.TileToWorldPosition(tile),true);
         hd.MoveToOrigin();
         
-        grid.PrintGridArray(txt);
+        PrintGridArray();
     }
 
     public int GetNumberOfValue()
@@ -54,6 +75,15 @@ public class BaseMap : MonoBehaviour
             Destroy(hero.gameObject);
         });
         
+        PrintGridArray();
+    }
+
+    #region Upimportant methods, just for debugging
+
+    public void PrintGridArray()
+    {
         grid.PrintGridArray(txt);
     }
+
+    #endregion
 }

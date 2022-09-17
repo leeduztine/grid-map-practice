@@ -29,7 +29,7 @@ public class Deck : BaseMap
         base.Start();
     }
 
-    public override void DragIntoMap(HeroDragging hd)
+    public  void DragIntoDeck(HeroDragging hd)
     {
         Tile nullTile = new Tile(-1,-1);
         Tile selectedTile = grid.WorldPositionToTile(UtilsClass.GetMouseWorldPosition());
@@ -59,6 +59,39 @@ public class Deck : BaseMap
         }
         
         base.DragIntoMap(hd);
+    }
+
+    public override void DragIntoMap(HeroDragging hd)
+    {
+        base.DragIntoMap(hd);
+    }
+
+    public override void DropIntoMap(HeroDragging hd,Tile destination)
+    {
+        var source = hd.gridType;
+        
+        switch (source)
+        {
+            case GridType.Deck:
+                // move Deck -> Deck
+                grid.SetValue(grid.WorldPositionToTile(hd.origin), null);
+                grid.SetValue(destination, hd.gameObject.GetComponent<HeroProfile>());
+                hd.UpdateOrigin(grid.TileToWorldPosition(destination),false);
+                hd.MoveToOrigin();
+                break;
+            
+            case GridType.Ground:
+                // move Ground -> Deck
+                var groundGrid = Ground.Instance.GetGrid();
+                groundGrid.SetValue(groundGrid.WorldPositionToTile(hd.origin),null);
+                grid.SetValue(destination, hd.gameObject.GetComponent<HeroProfile>());
+                hd.UpdateOrigin(grid.TileToWorldPosition(destination),false);
+                hd.MoveToOrigin();
+                break;
+            
+            default:
+                break;
+        }
     }
 
     public override void SwapHero(HeroDragging hd1, HeroDragging hd2)

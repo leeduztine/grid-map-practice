@@ -1,0 +1,8 @@
+[17/9]
+Done:
+- sửa lại tier, hp bar thành dạng UI
+- thêm anim cho tier, hp bar khi dragging
+- block spam click
+Todo:
+- Sửa lại cơ chế move, swap để có thể move giữa ground và tile
+

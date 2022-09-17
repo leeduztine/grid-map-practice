@@ -32,7 +32,7 @@ namespace GridMap
 
         private Tile nullTile = new Tile(-1,-1);
 
-        private bool CheckValidTile(Tile tile)
+        public bool IsValid(Tile tile)
         {
             if (tile.x < 0 || tile.x >= width || tile.y < 0 || tile.y >= height)
             {
@@ -77,14 +77,14 @@ namespace GridMap
         
         public void SetValue(Tile tile, TGridObject value)
         {
-            if (!CheckValidTile(tile)) return;
+            if (!IsValid(tile)) return;
             
             gridArray[tile.x, tile.y] = value;
         }
         
         public TGridObject GetValue(Tile tile)
         {
-            if (!CheckValidTile(tile)) return default;
+            if (!IsValid(tile)) return default;
 
             return gridArray[tile.x, tile.y];
         }
@@ -113,7 +113,7 @@ namespace GridMap
             {
                 for (int y = posY - range; y <= posY + range; y++)
                 {
-                    if (!CheckValidTile(new Tile(x,y)) || tile == new Tile(x,y))
+                    if (!IsValid(new Tile(x,y)) || tile == new Tile(x,y))
                     {
                         continue;
                     }
@@ -125,9 +125,15 @@ namespace GridMap
             return tiles;
         }
 
+        public int GetRange(Tile t1, Tile t2)
+        {
+            if (!IsValid(t1) || !IsValid(t2)) return 0;
+            return Mathf.Max(Mathf.Abs(t1.x - t2.x), Mathf.Abs(t1.y - t2.y));
+        }
+
         public void SwapValue(Tile tile1, Tile tile2)
         {
-            if (!CheckValidTile(tile1) || !CheckValidTile(tile2)) return;
+            if (!IsValid(tile1) || !IsValid(tile2)) return;
             
             var tmpData1 = GetValue(tile1);
             var tmpData2 = GetValue(tile2);

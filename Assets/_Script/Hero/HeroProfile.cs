@@ -5,6 +5,7 @@ using DG.Tweening;
 using GridMap;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.UI;
 
 public class HeroProfile : MonoBehaviour
 {
@@ -36,8 +37,8 @@ public class HeroProfile : MonoBehaviour
     private int tier = 1;
 
     [SerializeField] private Transform tierContainer;
-    [SerializeField] private Transform mainHpBar;
-    [SerializeField] private Transform subHpBar;
+    [SerializeField] private Image mainHpBar;
+    [SerializeField] private Image fxHpBar;
 
     public Action<bool> OnHpChangeCallback;
 
@@ -154,20 +155,20 @@ public class HeroProfile : MonoBehaviour
     {
         if (isDamaged)
         {
-            subHpBar.GetChild(0).GetComponent<SpriteRenderer>().color = Color.yellow;
+            fxHpBar.color = Color.yellow;
             DOTween.Kill(mainHpBar);
-            mainHpBar.DOScaleX(GetHpPercentage(), 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+            mainHpBar.DOFillAmount(GetHpPercentage(), 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
-                subHpBar.DOScaleX(GetHpPercentage(), 0.2f).SetEase(Ease.InQuad);
+                fxHpBar.DOFillAmount(GetHpPercentage(), 0.2f).SetEase(Ease.InQuad);
             });
         }
         else
         {
-            subHpBar.GetChild(0).GetComponent<SpriteRenderer>().color = Color.green;
-            DOTween.Kill(subHpBar);
-            subHpBar.DOScaleX(GetHpPercentage(), 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+            fxHpBar.color = Color.green;
+            DOTween.Kill(fxHpBar);
+            fxHpBar.DOFillAmount(GetHpPercentage(), 0.1f).SetEase(Ease.Linear).OnComplete(() =>
             {
-                mainHpBar.DOScaleX(GetHpPercentage(), 0.2f).SetEase(Ease.InQuad);
+                mainHpBar.DOFillAmount(GetHpPercentage(), 0.2f).SetEase(Ease.InQuad);
             });
         }
     }

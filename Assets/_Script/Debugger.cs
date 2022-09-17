@@ -1,21 +1,37 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using CodeMonkey.Utils;
 using UnityEngine;
 using GridMap;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
+using UnityEngine.UI;
 
-public class Debugger : MonoBehaviour
+public class Debugger : MonoBehaviourSingleton<Debugger>
 {
     public GameObject heroPrefab;
 
     [TableList] public List<Hero> team;
 
+    public InputField terminal;
+    public Button checkNullBtn;
+
     private void Start()
     {
+        StartCoroutine(SpawnTeamAfter(1f));
         
+        checkNullBtn.onClick.RemoveAllListeners();
+        checkNullBtn.onClick.AddListener(CheckNull);
     }
+
+    IEnumerator SpawnTeamAfter(float time)
+    {
+        yield return new WaitForSeconds(time);
+        SpawnTeam();
+    }
+
+    public bool autoSpawnTeam = false;
 
     [Button]
     public void SpawnTeam()
@@ -47,6 +63,32 @@ public class Debugger : MonoBehaviour
     {
         Ground.Instance.DestroyAll();
         Deck.Instance.DestroyAll();
+    }
+
+    [Button]
+    public void CheckNull()
+    {
+        string msg = terminal.text;
+        string[] msgs = msg.Split(" ");
+
+        int x = int.Parse(msgs[1]);
+        int y = int.Parse(msgs[2]);
+        Tile t = new Tile(x, y);
+        if (msgs[0] == "d")
+        {
+            Debug.Log(Deck.Instance.GetGrid().GetValue(t));
+        }
+        
+        if (msgs[0] == "g")
+        {
+            Debug.Log(Ground.Instance.GetGrid().GetValue(t));
+        }
+    }
+
+    public void PrintGridArray()
+    {
+        Ground.Instance.PrintGridArray();
+        Deck.Instance.PrintGridArray();
     }
 }
 
