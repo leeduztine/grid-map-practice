@@ -31,9 +31,9 @@ public class BaseMap : MonoBehaviour
         
         Tile selectedTile = grid.WorldPositionToTile(hd.transform.position);
 
-        if (!grid.IsValid(selectedTile) || selectedTile == hd.curTile)
+        if (!grid.IsValid(selectedTile))
         {
-            // not selected Deck or selected current Tile
+            // selected outside Map
             hd.MoveToOrigin();
             return;
         }
@@ -48,16 +48,20 @@ public class BaseMap : MonoBehaviour
 
     public virtual void SwapHero(HeroDragging hd1, HeroDragging hd2)
     {
-        
+        Vector3 hd1Pos = hd1.origin;
+        Vector3 hd2Pos = hd2.origin;
+        var hd1Type = hd1.gridType;
+        var hd2Type = hd2.gridType;
+
+        hd1.UpdateOrigin(hd2Pos, hd2Type == GridType.Ground);
+        hd1.MoveToOrigin();
+        hd2.UpdateOrigin(hd1Pos, hd1Type == GridType.Ground);
+        hd2.MoveToOrigin();
     }
 
-    public void SpawnHero(HeroDragging hd, Tile tile)
+    public virtual void SpawnHero(HeroDragging hd, Tile tile)
     {
-        grid.SetValue(tile,hd.gameObject.GetComponent<HeroProfile>());
-        hd.UpdateOrigin(grid.TileToWorldPosition(tile),true);
-        hd.MoveToOrigin();
         
-        PrintGridArray();
     }
 
     public int GetNumberOfValue()

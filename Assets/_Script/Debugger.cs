@@ -6,6 +6,7 @@ using UnityEngine;
 using GridMap;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine.UI;
 
 public class Debugger : MonoBehaviourSingleton<Debugger>
@@ -39,6 +40,7 @@ public class Debugger : MonoBehaviourSingleton<Debugger>
         team.ForEach(hero =>
         {
             GameObject obj = Instantiate(heroPrefab, Vector3.zero, quaternion.identity);
+            obj.name = GameManager.Instance.GetHeroState(hero.id).heroName;
             obj.GetComponent<HeroProfile>().LoadHeroState(GameManager.Instance.GetHeroState(hero.id), hero.curXp);
             if (hero.gridType == GridType.Ground)
             {

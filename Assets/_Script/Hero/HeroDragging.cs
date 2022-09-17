@@ -92,11 +92,13 @@ public class HeroDragging : MonoBehaviour
         }
     }
 
-    public void UpdateOrigin(Vector3 pos, bool isOnGround)
+    public void UpdateOrigin(Vector3 pos, bool isMovedToGround)
     {
+        if (Vector3.Distance(origin,pos) < 0.1f) return;
+        
         origin = pos;
 
-        if (isOnGround)
+        if (isMovedToGround)
         {
             transform.localScale = scaleOnGround * Vector3.one;
             gridType = GridType.Ground;
@@ -111,7 +113,7 @@ public class HeroDragging : MonoBehaviour
         
         Debugger.Instance.PrintGridArray();
         
-        Debug.Log($"{gridType} {curTile.x},{curTile.y}");
+        Debug.Log($"{name} move to {gridType}[{curTile.x},{curTile.y}]");
     }
 
     public void MoveToOrigin()

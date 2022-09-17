@@ -245,6 +245,11 @@ MonoBehaviour:
     gridType: 0
     curTileX: 0
     curTileY: 0
+  - id: 1
+    curXp: 30
+    gridType: 1
+    curTileX: 0
+    curTileY: 0
   terminal: {fileID: 309052107}
   checkNullBtn: {fileID: 2139988392}
   autoSpawnTeam: 1
