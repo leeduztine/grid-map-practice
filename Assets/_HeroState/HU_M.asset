@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64362139d39d492ba1955fce9905bf53, type: 3}
-  m_Name: Elf
+  m_Name: HU_M
   m_EditorClassIdentifier: 
-  id: 1
-  heroName: Elf
-  icon: {fileID: 21300000, guid: d0f9180a11e944540ac893eb86d13352, type: 3}
-  img: {fileID: 0}
+  id: 3
+  heroName: Human Male
+  icon: {fileID: 21300000, guid: a65dbc9df0398bb45a9ae2c20a256825, type: 3}
+  img: {fileID: 21300000, guid: a65dbc9df0398bb45a9ae2c20a256825, type: 3}
   hp: 70
   atk: 14
   armor: 2

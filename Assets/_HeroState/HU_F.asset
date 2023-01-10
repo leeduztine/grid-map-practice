@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64362139d39d492ba1955fce9905bf53, type: 3}
-  m_Name: Dragon
+  m_Name: HU_F
   m_EditorClassIdentifier: 
-  id: 0
-  heroName: Dragon
-  icon: {fileID: 21300000, guid: ae6c97130e1d1d344bdbf600f638fdd1, type: 3}
-  img: {fileID: 0}
+  id: 2
+  heroName: Human Female
+  icon: {fileID: 21300000, guid: f74101c8000187c449bb8830fae5512f, type: 3}
+  img: {fileID: 21300000, guid: f74101c8000187c449bb8830fae5512f, type: 3}
   hp: 100
   atk: 10
   armor: 5

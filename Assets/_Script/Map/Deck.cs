@@ -89,4 +89,20 @@ public class Deck : BaseMap
         
         PrintGridArray();
     }
+
+    public Tile GetAvailableTile()
+    {
+        Tile tile = new Tile(-1, -1);
+
+        for (int x=0; x<5; x++)
+        {
+            if (grid.GetValue(new Tile(x, 0)) == null)
+            {
+                tile = new Tile(x, 0);
+                break;
+            }
+        }
+        
+        return tile;
+    }
 }

@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using GridMap;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
     [TableList] 
-    public List<HeroData> heroes;
+    public List<HeroState> heroes;
 
     public HeroState GetHeroState(int id)
     {
-        return heroes.Find(hero => hero.id == id).state;
+        return heroes.Find(hero => hero.id == id);
     }
-}
 
-[Serializable]
-public class HeroData
-{
-    public int id;
-    public HeroState state;
+    public HeroState GetRandomHeroState()
+    {
+        int randId = Random.Range(0, heroes.Count);
+        return heroes.Find(hero => hero.id == randId);
+    }
 }

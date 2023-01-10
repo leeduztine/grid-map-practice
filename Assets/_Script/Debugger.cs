@@ -53,6 +53,21 @@ public class Debugger : MonoBehaviourSingleton<Debugger>
         });
     }
 
+    public void SpawnHero(Hero hr, Vector3 origin)
+    {
+        GameObject obj = Instantiate(heroPrefab, origin, quaternion.identity);
+        obj.name = GameManager.Instance.GetHeroState(hr.id).heroName;
+        obj.GetComponent<HeroProfile>().LoadHeroState(GameManager.Instance.GetHeroState(hr.id), hr.curXp);
+        if (hr.gridType == GridType.Ground)
+        {
+            Ground.Instance.SpawnHero(obj.GetComponent<HeroDragging>(),new Tile(hr.curTileX, hr.curTileY));
+        }
+        else
+        {
+            Deck.Instance.SpawnHero(obj.GetComponent<HeroDragging>(),new Tile(hr.curTileX, hr.curTileY));   
+        }
+    }
+
     [Button]
     public void PrintNumberOfValue()
     {
